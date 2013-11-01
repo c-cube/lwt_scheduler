@@ -11,18 +11,18 @@ BuildTools:  ocamlbuild
 
 Synopsis:    Utils to schedule tasks in the future, using Lwt
 
-Library "lwt-scheduler"
+Library "lwt_scheduler"
   Path:             src
   Pack:             true
   Modules:          Scheduler, Heap
   BuildDepends:     lwt,lwt.unix
   XMETARequires:    lwt
 
-Document "lwt-scheduler"
+Document "lwt_scheduler"
   Title:                documentation
   Type:                 ocamlbuild (0.3)
   BuildTools+:          ocamldoc
   Install:              true
   XOCamlbuildPath:      .
-  XOCamlbuildLibraries: lwt-scheduler
+  XOCamlbuildLibraries: lwt_scheduler
 

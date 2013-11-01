@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: d38b0a048d0bdd30840dbd3cae09341c)
+# DO NOT EDIT (digest: 9c4ef9897d9ac3de2fbe320812aa529d)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -13,10 +13,10 @@
 ".git": not_hygienic
 "_darcs": -traverse
 "_darcs": not_hygienic
-# Library lwt-scheduler
-"src/lwt-scheduler.cmxs": use_lwt-scheduler
-"src/scheduler.cmx": for-pack(Lwt-scheduler)
-"src/heap.cmx": for-pack(Lwt-scheduler)
+# Library lwt_scheduler
+"src/lwt_scheduler.cmxs": use_lwt_scheduler
+"src/scheduler.cmx": for-pack(Lwt_scheduler)
+"src/heap.cmx": for-pack(Lwt_scheduler)
 <src/*.ml{,i}>: pkg_lwt
 <src/*.ml{,i}>: pkg_lwt.unix
 # OASIS_STOP

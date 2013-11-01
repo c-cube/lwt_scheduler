@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 9dbe0a1e32e3f72e058d1374a1b72102) *)
+(* DO NOT EDIT (digest: b0f9fab755d000c52ff86b64a64bede4) *)
 module OASISGettext = struct
 (* # 21 "src/oasis/OASISGettext.ml" *)
 
@@ -477,7 +477,7 @@ end
 open Ocamlbuild_plugin;;
 let package_default =
   {
-     MyOCamlbuildBase.lib_ocaml = [("lwt-scheduler", ["src"])];
+     MyOCamlbuildBase.lib_ocaml = [("lwt_scheduler", ["src"])];
      lib_c = [];
      flags = [];
      includes = [];

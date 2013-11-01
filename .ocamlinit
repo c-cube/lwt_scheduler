@@ -2,6 +2,7 @@
 #require "lwt";;
 #require "lwt.unix";;
 #directory "_build/src/";;
-#load "lwt-scheduler.cma";;
+#load "lwt_scheduler.cma";;
+module Sched = Lwt_scheduler.Scheduler;;
 (* vim:syntax=ocaml:
 *)
