@@ -3,6 +3,5 @@
 #require "lwt.unix";;
 #directory "_build/src/";;
 #load "lwt_scheduler.cma";;
-module Sched = Lwt_scheduler.Scheduler;;
 (* vim:syntax=ocaml:
 *)

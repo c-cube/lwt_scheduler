@@ -37,24 +37,14 @@ type 'a task = unit -> 'a Lwt.t
       future value, but is only evaluated some time in the future.
       A task may be called several times (see for instance {!repeat}) *)
 
-type t
-  (** A scheduler used to run tasks in the future *)
-
-val default : t
-  (** Default scheduler. It is used as a default argument for all
-      combinators that schedule tasks. *)
-
-val create : unit -> t
-  (** Create a new scheduler *)
-
-val at : ?sched:t -> float -> 'a task -> 'a Lwt.t
+val at : float -> 'a task -> 'a Lwt.t
   (** Run at the given Unix timestamp. If the timestamp is already in
       the past, then the task is run right now. *)
 
-val after : ?sched:t -> float -> 'a task -> 'a Lwt.t
+val after : float -> 'a task -> 'a Lwt.t
   (** [after s task] schedules the task to run in [s] seconds. *)
 
-val repeat : ?sched:t -> ?after:float -> every:float ->
+val repeat : ?after:float -> every:float ->
              'a task -> unit Lwt.t
   (** Run the task repeatedly, with a given time period (in seconds).
 
