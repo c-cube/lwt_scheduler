@@ -26,4 +26,153 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (** {1 Time Scheduler} *)
 
-type t
+let (>>=) = Lwt.bind
+
+type 'a task = unit -> 'a Lwt.t
+
+type scheduled = {
+  run : unit -> unit;   (* which task to run *)
+  timestamp : float;    (* time to run the task *)
+  id : int;             (* unique id *)
+  mutable cancelled : bool; (* cancelled? *)
+}
+
+(* compare two scheduled tasks *)
+let cmp sc1 sc2 =
+  let c = Pervasives.compare sc1.timestamp sc2.timestamp in
+  if c <> 0 then c else sc1.id - sc2.id
+
+type t = {
+  heap : scheduled Heap.t; (* scheduled tasks *)
+  mutable next_id : int;        (* used to generate unique IDs *)
+}
+
+let create () =
+  let sched = {
+    heap = Heap.empty ~cmp;
+    next_id = 0;
+  } in
+  sched
+
+let default = create ()
+
+(* fresh task ID *)
+let _next_id sched =
+  let n = sched.next_id in
+  sched.next_id <- n+1;
+  n
+
+(* next time we need to wake up to run some task *)
+let _next_time sched =
+  try
+    let s = Heap.min sched.heap in
+    s.timestamp
+  with Invalid_argument _ ->
+    max_float
+
+(* check whether there are some tasks to run *)
+let _check_tasks sched =
+  let rec check_min () =
+    let continue_ =
+      try
+        let scheduled = Heap.min sched.heap in
+        let now = Unix.gettimeofday () in
+        if scheduled.timestamp <= now
+          then begin
+            (* task happens now. Remove it, and run it if not cancelled *)
+            Heap.remove sched.heap;
+            if not (scheduled.cancelled)
+              then scheduled.run ();
+            true
+          end
+          else false
+      with Invalid_argument _ -> false
+    in
+    if continue_ then check_min ()
+  in
+  check_min ()
+
+(* runs task at given time, or right now if time is passed *)
+let _at sched time task =
+  let now = Unix.gettimeofday () in
+  if time < now
+    then task ()
+    else begin
+      let next = _next_time sched in
+      (* make a cancellable thread that can be started with [promise] *)
+      let fut, promise = Lwt.task () in
+      (* schedule the task itself *)
+      let scheduled = {
+        timestamp = time;
+        id = _next_id sched;
+        run = (fun () -> Lwt.wakeup promise ());
+        cancelled = false;
+      } in
+      Heap.insert sched.heap scheduled;
+      (* fut': the future result of the task *)
+      let fut' = fut >>= fun () -> task () in
+      (* if the task is early enough*)
+      if time < next
+        then begin
+          let check = Lwt_unix.sleep time in
+          Lwt.on_success check (fun () -> _check_tasks sched);
+        end;
+      fut'
+    end
+
+let at ?(sched=default) time task =
+  _at sched time task
+
+let after ?(sched=default) duration task =
+  let now = Unix.gettimeofday () in
+  _at sched (now +. duration) task
+
+let repeat ?(sched=default) ?after ~every task =
+  (* recursively do the task *)
+  let rec step () =
+    Lwt_unix.sleep every >>= fun () ->
+    task () >>= fun _ ->
+    step ()
+  in
+  (* start the loop within a cancellable task *)
+  let fut, promise = Lwt.task () in
+  let fut' = fut >>= fun () -> step () in
+  match after with
+  | None -> Lwt.wakeup promise (); Lwt.return_unit
+  | Some duration ->
+    let now = Unix.gettimeofday() in
+    _at sched (now +. duration)
+      (fun () -> Lwt.wakeup promise (); fut')
+
+let wait_until ~check task =
+  let rec step () =
+    check () >>= function
+    | false -> step()
+    | true -> task ()
+  in
+  let fut, promise = Lwt.task () in
+  let fut' = fut >>= step in
+  Lwt.wakeup promise ();
+  fut'
+
+let whenever ~check task =
+  let rec step () =
+    check () >>= function
+    | false -> step()
+    | true -> task () >>= fun _ -> step()
+  in
+  let fut, promise = Lwt.task () in
+  let fut' = fut >>= step in
+  Lwt.wakeup promise ();
+  fut'
+
+let while_ ~check task =
+  let rec step () =
+    check () >>= function
+    | true -> task () >>= fun _ -> step()
+    | false -> Lwt.return_unit (* exit loop *)
+  in
+  let fut, promise = Lwt.task () in
+  let fut' = fut >>= step in
+  Lwt.wakeup promise ();
+  fut'

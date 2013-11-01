@@ -14,7 +14,7 @@ Synopsis:    Utils to schedule tasks in the future, using Lwt
 Library "lwt-scheduler"
   Path:             src
   Pack:             true
-  Modules:          Scheduler
+  Modules:          Scheduler, Heap
   BuildDepends:     lwt,lwt.unix
   XMETARequires:    lwt
 
