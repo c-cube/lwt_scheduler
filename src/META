@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 06014e74e8a3c517e9b5b3453cd032c6)
+version = "0.1"
+description = "Utils to schedule tasks in the future, using Lwt"
+requires = "lwt"
+archive(byte) = "lwt-scheduler.cma"
+archive(byte, plugin) = "lwt-scheduler.cma"
+archive(native) = "lwt-scheduler.cmxa"
+archive(native, plugin) = "lwt-scheduler.cmxs"
+exists_if = "lwt-scheduler.cma"
+# OASIS_STOP
+

@@ -1,0 +1,28 @@
+OASISFormat: 0.3
+Name:        lwt-scheduler
+Version:     0.1
+Homepage:    https://github.com/c-cube/lwt-scheduler
+Authors:     Simon Cruanes
+License:     BSD3
+LicenseFile: LICENSE
+Plugins:     META (0.3), DevFiles (0.3)
+OCamlVersion: >= 3.12
+BuildTools:  ocamlbuild
+
+Synopsis:    Utils to schedule tasks in the future, using Lwt
+
+Library "lwt-scheduler"
+  Path:             src
+  Pack:             true
+  Modules:          Scheduler
+  BuildDepends:     lwt,lwt.unix
+  XMETARequires:    lwt
+
+Document "lwt-scheduler"
+  Title:                documentation
+  Type:                 ocamlbuild (0.3)
+  BuildTools+:          ocamldoc
+  Install:              true
+  XOCamlbuildPath:      .
+  XOCamlbuildLibraries: lwt-scheduler
+

@@ -1,0 +1,7 @@
+#use "topfind";;
+#require "lwt";;
+#require "lwt.unix";;
+#directory "_build/src/";;
+#load "lwt-scheduler.cma";;
+(* vim:syntax=ocaml:
+*)
